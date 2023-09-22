@@ -77,6 +77,19 @@ defmodule RickTacMortyWeb.PlayLive do
   end
 
   @impl true
+  # def handle_info(
+  #       {:game_state, %GameState{status: :done, won_by: player_id} = state} = _event,
+  #       %Phoenix.LiveView.Socket{assigns: %{player_id: player_id}} = socket
+  #     ) do
+  def handle_info({:game_state, %GameState{status: :done} = state} = _event, socket) do
+    updated_socket =
+      socket
+      |> clear_flash()
+      |> assign(:game, state)
+
+    {:noreply, push_event(updated_socket, "done", %{win: true})}
+  end
+
   def handle_info({:game_state, %GameState{} = state} = _event, socket) do
     updated_socket =
       socket
