@@ -27,9 +27,8 @@ defmodule RickTacMorty.GameState do
               Cell.build(:c31),
               Cell.build(:c32),
               Cell.build(:c33)
-            ]
-
-  # won_by: nil
+            ],
+            won_by: nil
 
   @type game_code :: String.t()
 
@@ -39,8 +38,8 @@ defmodule RickTacMorty.GameState do
           players: [Player.t()],
           player_turn: nil | integer(),
           timer_ref: nil | reference(),
-          board: [Cell.t()]
-          # won_by: nil | String.t()
+          board: [Cell.t()],
+          won_by: nil | String.t()
         }
 
   # 30 Minutes of inactivity ends the game
@@ -377,8 +376,8 @@ defmodule RickTacMorty.GameState do
       :playing ->
         {:ok, state}
 
-      # %Player{} = player ->
-      #   {:ok, %GameState{state | won_by: player.id}}
+      %Player{} = player ->
+        {:ok, %GameState{state | status: :done, won_by: player.id}}
 
       _game_done ->
         {:ok, %GameState{state | status: :done}}
