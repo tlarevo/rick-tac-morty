@@ -4,6 +4,7 @@ defmodule RickTacMortyWeb.Components do
   """
   use Phoenix.HTML
   alias RickTacMorty.GameState
+  require Phoenix.LiveView.Helpers
   alias RickTacMorty.Player
   alias RickTacMorty.Cell
 
@@ -103,7 +104,8 @@ defmodule RickTacMortyWeb.Components do
     end
   end
 
-  def result(%GameState{status: :done} = state) do
+  @spec game_result(GameState.t()) :: String.t()
+  def game_result(%GameState{status: :done} = state) do
     text =
       case GameState.result(state) do
         :draw ->
@@ -113,16 +115,8 @@ defmodule RickTacMortyWeb.Components do
           "#{winner_name} Wins!"
       end
 
-    ~E"""
-    <div class="m-4 sm:m-8 text-3xl sm:text-6xl text-center text-green-700">
-      <%= text %>
-    </div>
-    """
+    text
   end
 
-  def result(%GameState{} = _state) do
-    ~E"""
-
-    """
-  end
+  def game_result(%GameState{} = _state), do: ""
 end

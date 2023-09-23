@@ -53,7 +53,10 @@
     </div>
   <% end %>
 
-  <%= result(@game) %>
+  <div :if={@game.status == :done} class="m-4 sm:m-8 text-3xl sm:text-6xl text-center text-green-700">
+    <%= game_result(@game) %>
+  </div>
+
 
   <%= if @game.status == :done do %>
     <div class="text-center">
