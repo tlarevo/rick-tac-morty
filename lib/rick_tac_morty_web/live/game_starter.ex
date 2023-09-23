@@ -13,12 +13,14 @@ defmodule RickTacMortyWeb.GameStarter do
     field :name, :string
     field :game_code, :string
     field :type, Ecto.Enum, values: [:start, :join], default: :start
+    field :game_type, Ecto.Enum, values: [:HvH, :HvC, :CvC], default: :HvH
   end
 
   @type t :: %GameStarter{
           name: nil | String.t(),
           game_code: nil | String.t(),
-          type: :start | :join
+          type: :start | :join,
+          game_type: :HvH | :HvC | :CvC
         }
 
   @doc false

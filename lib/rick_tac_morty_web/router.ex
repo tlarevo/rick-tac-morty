@@ -18,8 +18,10 @@ defmodule RickTacMortyWeb.Router do
     pipe_through :browser
 
     # get "/", PageController, :home
-    live "/", PageLive, :index
-    live "/play", PlayLive, :index
+    live "/", StartLive
+    live "/player", PlayerLive
+    # live "/", PlayerLive, :index
+    live "/game", GameLive, :index
   end
 
   # Other scopes may use custom stacks.

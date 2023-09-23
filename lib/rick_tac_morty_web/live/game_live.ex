@@ -1,4 +1,4 @@
-defmodule RickTacMortyWeb.PlayLive do
+defmodule RickTacMortyWeb.GameLive do
   use RickTacMortyWeb, :live_view
   require Logger
   alias Phoenix.PubSub

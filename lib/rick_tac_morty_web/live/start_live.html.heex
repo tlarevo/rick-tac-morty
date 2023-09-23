@@ -1,0 +1,18 @@
+<div class="m-auto text-center">
+   <h1 class="text-4xl font-bold mb-4">Rick tac Morty</h1>
+   <p class="text-lg text-gray-600 mb-4">Tic Tac Toe with a Twist</p>
+   <div class="flex flex-1 px-28">
+    <img src="./images/ram_smwyg.gif" alt="">
+   </div>
+   <!-- Buttons Row -->
+   <div class="flex justify-center space-x-4">
+       <!-- Button 1 -->
+       <button phx-click="game_type_selected" phx-value-game_type="HvH" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Play Vs Human</button>
+
+       <!-- Button 2 -->
+       <button phx-click="game_type_selected" phx-value-game_type="HvC" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Play vs Computer</button>
+
+       <!-- Button 3 -->
+       <button phx-click="game_type_selected" phx-value-game_type="spectator" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Just watch a game</button>
+   </div>
+</div>

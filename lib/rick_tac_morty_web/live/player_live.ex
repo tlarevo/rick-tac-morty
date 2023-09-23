@@ -1,4 +1,4 @@
-defmodule RickTacMortyWeb.PageLive do
+defmodule RickTacMortyWeb.PlayerLive do
   use RickTacMortyWeb, :live_view
   import Phoenix.HTML.Form
   alias RickTacMortyWeb.GameStarter
@@ -6,10 +6,10 @@ defmodule RickTacMortyWeb.PageLive do
   alias RickTacMorty.GameServer
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     {:ok,
      socket
-     |> assign(:changeset, GameStarter.insert_changeset(%{}))}
+     |> assign(:changeset, GameStarter.insert_changeset(params))}
   end
 
   @impl true
@@ -24,6 +24,8 @@ defmodule RickTacMortyWeb.PageLive do
 
   @impl true
   def handle_event("save", %{"game_starter" => params}, socket) do
+    dbg(socket.assigns.changeset.data)
+
     with {:ok, starter} <- GameStarter.create(params),
          {:ok, game_code} <- GameStarter.get_game_code(starter),
          {:ok, player} <- Player.create(%{name: starter.name}),
@@ -32,9 +34,7 @@ defmodule RickTacMortyWeb.PageLive do
       params = %{game: game_code, player: player.id}
 
       socket =
-        push_navigate(socket,
-          to: ~p"/play?#{params}"
-        )
+        push_navigate(socket, to: ~p"/game?#{params}")
 
       {:noreply, socket}
     else
