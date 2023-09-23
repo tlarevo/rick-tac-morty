@@ -28,12 +28,12 @@ defmodule RickTacMortyWeb.PageLive do
          {:ok, game_code} <- GameStarter.get_game_code(starter),
          {:ok, player} <- Player.create(%{name: starter.name}),
          {:ok, _} <- GameServer.start_or_join(game_code, player) do
+      # Set params
       params = %{game: game_code, player: player.id}
 
       socket =
         push_navigate(socket,
           to: ~p"/play?#{params}"
-          # to: Routes.play_path(socket, :index, game: game_code, player: player.id)
         )
 
       {:noreply, socket}
