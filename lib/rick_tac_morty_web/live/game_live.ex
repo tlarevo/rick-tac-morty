@@ -82,6 +82,7 @@ defmodule RickTacMortyWeb.GameLive do
         %Phoenix.LiveView.Socket{assigns: %{player_id: player_id}} = socket
       ) do
     # def handle_info({:game_state, %GameState{status: :done} = state} = _event, socket) do
+
     updated_socket =
       socket
       |> clear_flash()
@@ -96,6 +97,7 @@ defmodule RickTacMortyWeb.GameLive do
       |> clear_flash()
       |> assign(:game, state)
 
+    dbg(state)
     {:noreply, updated_socket}
   end
 end

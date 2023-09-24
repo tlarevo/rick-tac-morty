@@ -179,6 +179,10 @@ defmodule RickTacMorty.GameServer do
   end
 
   def handle_call({:move, player_id, cell}, _from, %GameState{game_type: :HvC} = state) do
+    Logger.info("Player id: #{player_id}")
+
+    dbg(state)
+
     with {:ok, player} <- GameState.find_player(state, player_id),
          {:ok, new_state} <- GameState.move(state, player, cell) do
       broadcast_game_state(new_state)
@@ -206,10 +210,18 @@ defmodule RickTacMorty.GameServer do
 
   @impl true
   def handle_info(:start_computer_player, %GameState{} = state) do
-    player_id = Ecto.UUID.generate()
-    {:ok, _pid} = ComputerPlayerServer.start_link(player_id, state.code)
-    player_attr = %{name: "com_#{player_id}", is_computer: true}
-    {:ok, computer_player} = Player.create(player_attr)
+    player_letter = "X"
+    player_attr = %{name: "computer", letter: player_letter, is_computer: true}
+    {:ok, %Player{} = computer_player} = Player.create(player_attr)
+
+    {:ok, _pid} =
+      ComputerPlayerServer.start_link(
+        computer_player.id,
+        computer_player.letter,
+        state.code,
+        state
+      )
+
     Task.async(fn -> join_game(state.code, computer_player) end)
     {:noreply, state}
   end

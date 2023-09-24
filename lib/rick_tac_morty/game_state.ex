@@ -38,7 +38,7 @@ defmodule RickTacMorty.GameState do
           code: nil | String.t(),
           status: :not_started | :playing | :done,
           players: [Player.t()],
-          player_turn: nil | integer(),
+          player_turn: nil | String.t(),
           timer_ref: nil | reference(),
           board: [Cell.t()],
           won_by: nil | String.t(),
@@ -283,7 +283,7 @@ defmodule RickTacMorty.GameState do
   def find_cell(%GameState{} = state, cell) do
     case Enum.find(state.board, &(&1.name == cell)) do
       nil ->
-        {:error, "Cell not found"}
+        {:error, "Cell not found #{inspect(cell)}"}
 
       %Cell{} = cell ->
         {:ok, cell}
