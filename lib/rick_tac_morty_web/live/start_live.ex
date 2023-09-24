@@ -1,7 +1,7 @@
 defmodule RickTacMortyWeb.StartLive do
   use RickTacMortyWeb, :live_view
   alias RickTacMortyWeb.GameStarter
-  import Logger
+  require Logger
 
   @impl true
   def mount(_params, _session, socket) do
@@ -15,8 +15,9 @@ defmodule RickTacMortyWeb.StartLive do
     {:noreply, socket}
   end
 
-  def handle_event("game_type_selected", %{"game_type" => "HvC"}, socket) do
+  def handle_event("game_type_selected", %{"game_type" => "HvC"} = params, socket) do
     Logger.info("Play against computer")
+    socket = push_navigate(socket, to: ~p"/player?#{params}")
     {:noreply, socket}
   end
 

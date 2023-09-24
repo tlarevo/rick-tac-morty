@@ -32,6 +32,7 @@ defmodule RickTacMorty.GameState do
             game_type: nil
 
   @type game_code :: String.t()
+  @type game_type :: :HvH | :HvC | :CvC
 
   @type t :: %GameState{
           code: nil | String.t(),
@@ -50,9 +51,9 @@ defmodule RickTacMorty.GameState do
   @doc """
   Return an initialized GameState struct. Requires one player to start.
   """
-  @spec new(game_code(), Player.t()) :: t()
-  def new(game_code, %Player{} = player) do
-    %GameState{code: game_code, players: [%Player{player | letter: "O"}]}
+  @spec new(game_code(), Player.t(), game_type()) :: t()
+  def new(game_code, %Player{} = player, game_type) do
+    %GameState{code: game_code, players: [%Player{player | letter: "O"}], game_type: game_type}
     |> reset_inactivity_timer()
   end
 

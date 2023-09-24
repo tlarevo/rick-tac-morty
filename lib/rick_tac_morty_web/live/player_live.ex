@@ -6,10 +6,10 @@ defmodule RickTacMortyWeb.PlayerLive do
   alias RickTacMorty.GameServer
 
   @impl true
-  def mount(params, _session, socket) do
+  def mount(%{"game_type" => game_type} = params, _session, socket) do
     {:ok,
      socket
-     |> assign(:changeset, GameStarter.insert_changeset(params))}
+     |> assign(changeset: GameStarter.insert_changeset(params), game_type: game_type)}
   end
 
   @impl true
@@ -25,13 +25,14 @@ defmodule RickTacMortyWeb.PlayerLive do
   @impl true
   def handle_event("save", %{"game_starter" => params}, socket) do
     dbg(socket.assigns.changeset.data)
+    game_type = String.to_existing_atom(socket.assigns.game_type)
 
     with {:ok, starter} <- GameStarter.create(params),
          {:ok, game_code} <- GameStarter.get_game_code(starter),
          {:ok, player} <- Player.create(%{name: starter.name}),
-         {:ok, _} <- GameServer.start_or_join(game_code, player) do
+         {:ok, _} <- GameServer.start_or_join(game_code, player, game_type) do
       # Set params
-      params = %{game: game_code, player: player.id}
+      params = %{game: game_code, player: player.id, game_type: starter.game_type}
 
       socket =
         push_navigate(socket, to: ~p"/game?#{params}")

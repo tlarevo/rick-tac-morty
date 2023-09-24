@@ -9,16 +9,18 @@ defmodule RickTacMorty.GameServer do
   alias RickTacMorty.Player
   alias RickTacMorty.GameState
   alias Phoenix.PubSub
+  alias RickTacMorty.ComputerPlayerServer
 
   # Client
 
   def child_spec(opts) do
     name = Keyword.get(opts, :name, GameServer)
     player = Keyword.fetch!(opts, :player)
+    game_type = Keyword.fetch!(opts, :game_type)
 
     %{
       id: "#{GameServer}_#{name}",
-      start: {GameServer, :start_link, [name, player]},
+      start: {GameServer, :start_link, [name, player, game_type]},
       shutdown: 10_000,
       restart: :transient
     }
@@ -27,8 +29,10 @@ defmodule RickTacMorty.GameServer do
   @doc """
   Start a GameServer with the specified game_code as the name.
   """
-  def start_link(name, %Player{} = player) do
-    case GenServer.start_link(GameServer, %{player: player, code: name}, name: via_tuple(name)) do
+  def start_link(name, %Player{} = player, game_type) do
+    case GenServer.start_link(GameServer, %{player: player, code: name, game_type: game_type},
+           name: via_tuple(name)
+         ) do
       {:ok, pid} ->
         {:ok, pid}
 
@@ -72,12 +76,12 @@ defmodule RickTacMorty.GameServer do
   @doc """
   Start a new game or join an existing game.
   """
-  @spec start_or_join(GameState.game_code(), Player.t()) ::
+  @spec start_or_join(GameState.game_code(), Player.t(), GameState.game_type()) ::
           {:ok, :started | :joined} | {:error, String.t()}
-  def start_or_join(game_code, %Player{} = player) do
+  def start_or_join(game_code, %Player{} = player, game_type) do
     case Horde.DynamicSupervisor.start_child(
            RickTacMorty.DistributedSupervisor,
-           {GameServer, [name: game_code, player: player]}
+           {GameServer, [name: game_code, player: player, game_type: game_type]}
          ) do
       {:ok, _pid} ->
         Logger.info("Started game server #{inspect(game_code)}")
@@ -132,9 +136,15 @@ defmodule RickTacMorty.GameServer do
   ###
 
   @impl true
-  def init(%{player: player, code: code}) do
+  def init(%{player: player, code: code, game_type: :HvH = game_type}) do
     # Create the new game state with the creating player assigned
-    {:ok, GameState.new(code, player)}
+    {:ok, GameState.new(code, player, game_type)}
+  end
+
+  def init(%{player: player, code: code, game_type: :HvC = game_type}) do
+    # Create the new game state with the creating player assigned
+    Process.send_after(self(), :start_computer_player, 500)
+    {:ok, GameState.new(code, player, game_type)}
   end
 
   @impl true
@@ -156,7 +166,19 @@ defmodule RickTacMorty.GameServer do
   end
 
   @impl true
-  def handle_call({:move, player_id, cell}, _from, %GameState{} = state) do
+  def handle_call({:move, player_id, cell}, _from, %GameState{game_type: :HvH} = state) do
+    with {:ok, player} <- GameState.find_player(state, player_id),
+         {:ok, new_state} <- GameState.move(state, player, cell) do
+      broadcast_game_state(new_state)
+      {:reply, :ok, new_state}
+    else
+      {:error, reason} = error ->
+        Logger.error("Player move failed. Error: #{inspect(reason)}")
+        {:reply, error, state}
+    end
+  end
+
+  def handle_call({:move, player_id, cell}, _from, %GameState{game_type: :HvC} = state) do
     with {:ok, player} <- GameState.find_player(state, player_id),
          {:ok, new_state} <- GameState.move(state, player, cell) do
       broadcast_game_state(new_state)
@@ -180,6 +202,26 @@ defmodule RickTacMorty.GameServer do
     # Shutdown the game server when it's been inactive for too long.
     Logger.info("Game #{inspect(state.code)} was ended for inactivity")
     {:stop, :normal, state}
+  end
+
+  @impl true
+  def handle_info(:start_computer_player, %GameState{} = state) do
+    player_id = Ecto.UUID.generate()
+    {:ok, _pid} = ComputerPlayerServer.start_link(player_id, state.code)
+    player_attr = %{name: "com_#{player_id}", is_computer: true}
+    {:ok, computer_player} = Player.create(player_attr)
+    Task.async(fn -> join_game(state.code, computer_player) end)
+    {:noreply, state}
+  end
+
+  def handle_info({_, :ok}, %GameState{} = state) do
+    Logger.info("Handle info received")
+    {:noreply, state}
+  end
+
+  def handle_info({:DOWN, _ref, :process, _pid, :normal}, state) do
+    Logger.debug("Process DOWN!")
+    {:noreply, state}
   end
 
   def broadcast_game_state(%GameState{} = state) do
