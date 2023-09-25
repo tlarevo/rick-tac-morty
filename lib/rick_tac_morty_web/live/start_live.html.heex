@@ -1,11 +1,16 @@
-<div class="m-auto text-center">
-   <h1 class="text-4xl font-bold mb-4">Rick tac Morty</h1>
-   <p class="text-lg text-gray-600 mb-4">Tic Tac Toe with a Twist</p>
-   <div class="flex flex-1 px-28">
+<div class="flex flex-col text-center">
+   <div class="grid grid-flow-row auto-cols-max">
+     <h1 class="text-3xl lg:text-6xl 2xl:text-9xl font-bold mb-4 font-gloria-hallelujah">Rick tac Morty</h1>
+     <p class="text-lg lg:text-2xl 2xl:text-4xl text-gray-600 mb-4 font-gloria-hallelujah">Tic Tac Toe with a Twist</p>
+  </div>
+   <!-- <div class="flex flex-1 px-28"> -->
+   <!--  <img src="./images/ram_smwyg.gif" alt=""> -->
+   <!-- </div> -->
+   <div class="grid grid-cols-1">
     <img src="./images/ram_smwyg.gif" alt="">
    </div>
    <!-- Buttons Row -->
-   <div class="flex justify-center space-x-4">
+   <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 md:gap-4 lg:gap-6 p-5 font-gloria-hallelujah">
        <!-- Button 1 -->
        <button phx-click="game_type_selected" phx-value-game_type="HvH" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Play Vs Human</button>
 
