@@ -2,8 +2,6 @@
 
 ## Tic Tac Toe with a fun twist - Built with Phoenix LiveView 🧡
 
-![Tic Tac Toe App](tic_tac_toe_app_screenshot.png)
-
 ## Table of Contents
 
 - [Introduction](#introduction)
