@@ -23,6 +23,6 @@ defmodule RickTacMortyWeb.StartLive do
 
   def handle_event("game_type_selected", %{"game_type" => "spectator"}, socket) do
     Logger.info("Watch others play")
-    {:noreply, socket}
+    {:noreply, put_flash(socket, :error, "Sorry feature still not implemented")}
   end
 end
