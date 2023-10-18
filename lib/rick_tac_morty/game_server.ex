@@ -67,10 +67,7 @@ defmodule RickTacMorty.GameServer do
   defp do_generate_code() do
     # Generate a single 4 character random code
     range = ?A..?Z
-
-    1..4
-    |> Enum.map(fn _ -> [Enum.random(range)] |> List.to_string() end)
-    |> Enum.join("")
+    1..4 |> Enum.map_join("", fn _ -> [Enum.random(range)] |> List.to_string() end)
   end
 
   @doc """

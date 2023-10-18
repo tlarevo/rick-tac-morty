@@ -52,6 +52,7 @@ defmodule RickTacMorty.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:horde, "~> 0.8.7"},
       {:libcluster, "~> 3.3"}
+      # {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
