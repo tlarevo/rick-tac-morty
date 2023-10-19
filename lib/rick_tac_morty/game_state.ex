@@ -134,106 +134,34 @@ defmodule RickTacMorty.GameState do
   def player_turn?(%GameState{}, %Player{}), do: false
 
   @doc """
+  Given the game board arrangement and player letter returns the cell names owned by player
+  """
+  @spec get_player_owned_cells([Cell.t()], String.t()) :: [atom()]
+  def get_player_owned_cells(board, letter) do
+    for %Cell{} = cell <- board do
+      if cell.letter == letter, do: cell.name, else: nil
+    end
+  end
+
+  defp wining_arrangement([:c11, :c12, :c13 | _]), do: [:c11, :c12, :c13]
+  defp wining_arrangement([_, _, _, :c21, :c22, :c23 | _]), do: [:c21, :c22, :c23]
+  defp wining_arrangement([_ | [:c31, :c32, :c33]]), do: [:c31, :c32, :c33]
+  defp wining_arrangement([:c11, _, _, :c21, _, _, :c31 | _]), do: [:c11, :c21, :c31]
+  defp wining_arrangement([_, :c12, _, _, :c22, _, _, :c32 | _]), do: [:c12, :c22, :c32]
+  defp wining_arrangement([_, _, :c13, _, _, :c23, _, _, :c33]), do: [:c13, :c23, :c33]
+  defp wining_arrangement([:c11, _, _, _, :c22, _, _, _, :c33]), do: [:c11, :c22, :c33]
+  defp wining_arrangement([_, _, :c13, _, :c22, _, :c31 | _]), do: [:c13, :c22, :c31]
+  defp wining_arrangement(_), do: :not_found
+
+  @doc """
   Check to see if the player won. Return a tuple of the winning cells if the they won. If no win found, returns `:not_found`.
 
   Tests for all the different ways the player could win.
   """
+
   @spec check_for_player_win(t(), Player.t()) :: :not_found | [atom()]
   def check_for_player_win(%GameState{board: board}, %Player{letter: letter}) do
-    case board do
-      #
-      # Check for all the straight across wins
-      [%Cell{letter: ^letter}, %Cell{letter: ^letter}, %Cell{letter: ^letter} | _] ->
-        [:c11, :c12, :c13]
-
-      [_, _, _, %Cell{letter: ^letter}, %Cell{letter: ^letter}, %Cell{letter: ^letter} | _] ->
-        [:c21, :c22, :c23]
-
-      [
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        %Cell{letter: ^letter},
-        %Cell{letter: ^letter},
-        %Cell{letter: ^letter}
-      ] ->
-        [:c31, :c32, :c33]
-
-      #
-      # Check for all the vertical wins
-      [
-        %Cell{letter: ^letter},
-        _,
-        _,
-        %Cell{letter: ^letter},
-        _,
-        _,
-        %Cell{letter: ^letter},
-        _,
-        _ | _
-      ] ->
-        [:c11, :c21, :c31]
-
-      [
-        _,
-        %Cell{letter: ^letter},
-        _,
-        _,
-        %Cell{letter: ^letter},
-        _,
-        _,
-        %Cell{letter: ^letter},
-        _ | _
-      ] ->
-        [:c12, :c22, :c32]
-
-      [
-        _,
-        _,
-        %Cell{letter: ^letter},
-        _,
-        _,
-        %Cell{letter: ^letter},
-        _,
-        _,
-        %Cell{letter: ^letter} | _
-      ] ->
-        [:c13, :c23, :c33]
-
-      #
-      # Check for the diagonal wins
-      [
-        %Cell{letter: ^letter},
-        _,
-        _,
-        _,
-        %Cell{letter: ^letter},
-        _,
-        _,
-        _,
-        %Cell{letter: ^letter} | _
-      ] ->
-        [:c11, :c22, :c33]
-
-      [
-        _,
-        _,
-        %Cell{letter: ^letter},
-        _,
-        %Cell{letter: ^letter},
-        _,
-        %Cell{letter: ^letter},
-        _,
-        _ | _
-      ] ->
-        [:c13, :c22, :c31]
-
-      _ ->
-        :not_found
-    end
+    board |> get_player_owned_cells(letter) |> wining_arrangement()
   end
 
   @doc """

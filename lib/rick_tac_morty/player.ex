@@ -45,6 +45,14 @@ defmodule RickTacMorty.Player do
 
   @doc """
   Create a Player struct instance from the attributes.
+
+  ## Example
+
+    iex> alias RickTacMorty.Player
+    iex> {:ok, %Player{name: "rick", letter: nil, is_computer: nil} = player } = Player.create(%{name: "rick"})
+    iex> true = Map.has_key?(player, :id)
+    iex> {:error, %Ecto.Changeset{} = _changeset} = Player.create(%{})
+
   """
   @spec create(params :: map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def create(params) do

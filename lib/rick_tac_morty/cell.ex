@@ -13,9 +13,27 @@ defmodule RickTacMorty.Cell do
 
   @doc """
   Build and return a board square. Provide the name.
+
+  ## Example
+
+    iex> alias RickTacMorty.Cell
+    iex> Cell.build(:c11)
+    %Cell{name: :c11, letter: nil}
+
+    iex> alias RickTacMorty.Cell
+    iex> Cell.build(:c12, "O")
+    %Cell{name: :c12, letter: "O"}
+
+    iex> alias RickTacMorty.Cell
+    iex> Cell.build(:c12, "X")
+    %Cell{name: :c12, letter: "X"}
+
+    iex> alias RickTacMorty.Cell
+    iex> Cell.build("X")
+    ** (FunctionClauseError) no function clause matching in RickTacMorty.Cell.build/2
   """
   @spec build(name :: atom, letter :: nil | String.t()) :: t()
-  def build(name, letter \\ nil) do
+  def build(name, letter \\ nil) when is_atom(name) do
     %Cell{name: name, letter: letter}
   end
 
@@ -25,13 +43,13 @@ defmodule RickTacMorty.Cell do
 
   ## Example
 
-      iex> Cell.is_open?(%RickTacMorty.Cell{name: :c11, letter: nil})
+      iex> RickTacMorty.Cell.is_open?(%RickTacMorty.Cell{name: :c11, letter: nil})
       true
 
-      iex> Cell.is_open?(%RickTacMorty.Cell{name: :c11, letter: "O"})
+      iex> RickTacMorty.Cell.is_open?(%RickTacMorty.Cell{name: :c11, letter: "O"})
       false
 
-      iex> Cell.is_open?(%RickTacMorty.Cell{name: :c11, letter: "X"})
+      iex> RickTacMorty.Cell.is_open?(%RickTacMorty.Cell{name: :c11, letter: "X"})
       false
   """
   @spec is_open?(t()) :: boolean()
