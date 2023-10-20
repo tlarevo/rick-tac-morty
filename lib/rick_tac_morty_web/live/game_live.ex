@@ -18,7 +18,30 @@ defmodule RickTacMortyWeb.GameLive do
      assign(socket,
        game_code: game_code,
        player_id: player_id,
+       participant_type: :player,
        player: nil,
+       game: GameServer.get_current_game_state(game_code),
+       server_found: GameServer.server_found?(game_code)
+     )}
+  end
+
+  def mount(
+        %{"game" => game_code, "participant_type" => "spectator", "participant_name" => name} =
+          _params,
+        _session,
+        socket
+      ) do
+    if connected?(socket) do
+      # Subscribe to game update notifications
+      PubSub.subscribe(RickTacMorty.PubSub, "game:#{game_code}")
+      send(self(), :load_game_state)
+    end
+
+    {:ok,
+     assign(socket,
+       game_code: game_code,
+       participant_type: :spectator,
+       spectator_name: name,
        game: %GameState{},
        server_found: GameServer.server_found?(game_code)
      )}
@@ -57,6 +80,20 @@ defmodule RickTacMortyWeb.GameLive do
   end
 
   @impl true
+  def handle_info(
+        :load_game_state,
+        %{assigns: %{server_found: true, participant_type: :spectator}} = socket
+      ) do
+    case GameServer.get_current_game_state(socket.assigns.game_code) do
+      %GameState{} = game ->
+        {:noreply, assign(socket, server_found: true, game: game)}
+
+      error ->
+        Logger.error("Failed to load game server state. #{inspect(error)}")
+        {:noreply, assign(socket, :server_found, false)}
+    end
+  end
+
   def handle_info(:load_game_state, %{assigns: %{server_found: true}} = socket) do
     case GameServer.get_current_game_state(socket.assigns.game_code) do
       %GameState{} = game ->

@@ -9,12 +9,12 @@
    <!-- Buttons Row -->
    <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 md:gap-4 lg:gap-6 p-5">
        <!-- Button 1 -->
-       <button phx-click="game_type_selected" phx-value-game_type="HvH" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Play Vs Human</button>
+       <button phx-click="game_type_selected" phx-value-participant_type="player" phx-value-game_type="HvH" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Play Vs Human</button>
 
        <!-- Button 2 -->
-       <button phx-click="game_type_selected" phx-value-game_type="HvC" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Play vs Computer</button>
+       <button phx-click="game_type_selected" phx-value-participant_type="player" phx-value-game_type="HvC" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Play vs Computer</button>
 
        <!-- Button 3 -->
-       <button phx-click="game_type_selected" phx-value-game_type="spectator" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Just watch a game</button>
+       <button phx-click="participant_type_selected" phx-value-participant_type="spectator" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Just watch a game</button>
    </div>
 </div>

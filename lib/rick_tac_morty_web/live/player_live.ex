@@ -1,4 +1,7 @@
 defmodule RickTacMortyWeb.PlayerLive do
+  @moduledoc """
+  LiveView that captures the player details
+  """
   use RickTacMortyWeb, :live_view
   import Phoenix.HTML.Form
   alias RickTacMortyWeb.GameStarter
@@ -6,10 +9,27 @@ defmodule RickTacMortyWeb.PlayerLive do
   alias RickTacMorty.GameServer
 
   @impl true
-  def mount(%{"game_type" => game_type} = params, _session, socket) do
+  def mount(
+        %{"game_type" => game_type, "participant_type" => participant_type} = params,
+        _session,
+        socket
+      ) do
     {:ok,
      socket
-     |> assign(changeset: GameStarter.insert_changeset(params), game_type: game_type)}
+     |> assign(
+       changeset: GameStarter.insert_changeset(params),
+       game_type: game_type,
+       participant_type: participant_type
+     )}
+  end
+
+  def mount(%{"participant_type" => participant_type} = params, _session, socket) do
+    {:ok,
+     socket
+     |> assign(
+       changeset: GameStarter.insert_changeset(params),
+       participant_type: participant_type
+     )}
   end
 
   @impl true
@@ -23,8 +43,25 @@ defmodule RickTacMortyWeb.PlayerLive do
   end
 
   @impl true
+  def handle_event(
+        "save",
+        %{
+          "game_starter" => %{"game_code" => game_code, "name" => name},
+          "participant_type" => "spectator"
+        } = params,
+        socket
+      ) do
+    dbg(params)
+    params = %{game: game_code, participant_type: "spectator", participant_name: name}
+
+    socket =
+      push_navigate(socket, to: ~p"/game?#{params}")
+
+    {:noreply, socket}
+  end
+
   def handle_event("save", %{"game_starter" => params}, socket) do
-    dbg(socket.assigns.changeset.data)
+    dbg(socket.assigns.game_type)
     game_type = String.to_existing_atom(socket.assigns.game_type)
 
     with {:ok, starter} <- GameStarter.create(params),
@@ -50,4 +87,7 @@ defmodule RickTacMortyWeb.PlayerLive do
   defp new_game?(changeset) do
     Ecto.Changeset.get_field(changeset, :type) == :start
   end
+
+  defp spectator?("spectator"), do: true
+  defp spectator?(_), do: false
 end

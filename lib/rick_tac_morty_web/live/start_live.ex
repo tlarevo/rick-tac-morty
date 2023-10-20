@@ -1,4 +1,8 @@
 defmodule RickTacMortyWeb.StartLive do
+  @moduledoc """
+  LiveView module for starting the game and picking play type such as play against
+  human player, computer player or just watch a ongoing match
+  """
   use RickTacMortyWeb, :live_view
   alias RickTacMortyWeb.GameStarter
   require Logger
@@ -21,8 +25,14 @@ defmodule RickTacMortyWeb.StartLive do
     {:noreply, socket}
   end
 
-  def handle_event("game_type_selected", %{"game_type" => "spectator"}, socket) do
+  def handle_event(
+        "participant_type_selected",
+        %{"participant_type" => "spectator"} = params,
+        socket
+      ) do
     Logger.info("Watch others play")
-    {:noreply, put_flash(socket, :error, "Sorry feature still not implemented")}
+    # {:noreply, put_flash(socket, :error, "Sorry feature still not implemented")}
+    socket = push_navigate(socket, to: ~p"/player?#{params}")
+    {:noreply, socket}
   end
 end

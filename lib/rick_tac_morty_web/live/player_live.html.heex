@@ -1,5 +1,5 @@
 <div class="lg:mt-8 space-y-8 divide-y divide-gray-200">
-  <.form :let={f} for={@changeset} id="player-form" phx-change="validate" phx-submit="save">
+  <.form :let={f} for={@changeset} id="player-form" phx-change="validate" phx-submit="save" phx-value-participant_type={@participant_type}>
     <div class="space-y-8 divide-y divide-gray-200">
       <div>
         <div class="flex items-center justify-center">
@@ -7,10 +7,10 @@
          </div>
         <div>
           <h3 class="text-lg leading-6 font-medium text-gray-900">
-            Player Settings
+            <%= if not spectator?(@participant_type), do: "Player", else: "Spectator" %> Settings
           </h3>
           <p class="mt-1 text-sm text-gray-500">
-            Player information and configuration.
+            <%= if not spectator?(@participant_type), do: "Player", else: "Spectator" %> information and configuration.
           </p>
         </div>
 
@@ -27,30 +27,44 @@
             <div class="mt-1">
               <%= text_input(f, :game_code, class: "shadow-sm focus:ring-emerald-500 focus:border-emerald-500 block w-full sm:text-sm border-gray-300 rounded-md", autocomplete: "off") %>
             </div>
-            <p class="mt-2 text-sm text-gray-500" id="game_code-description">Leave it blank to start a new game</p>
+            <%= if not spectator?(@participant_type) do %>
+              <p class="mt-2 text-sm text-gray-500" id="game_code-description">Leave it blank to start a new game</p>
+            <% else %>
+              <p class="mt-2 text-sm text-gray-500" id="game_code-description">Enter the game code of the started game</p>
+            <% end %>
           </div>
         </div>
 
         <div class="mt-6 text-right">
-          <%= if new_game?(@changeset) do %>
-            <div class="pt-5">
-              <div class="flex items-center justify-center">
-                <%= submit(class: "inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500") do %>
-                  New Game
-                <% end %>
+          <%= if spectator?(@participant_type) do %>
+              <div class="pt-5">
+                <div class="flex items-center justify-center">
+                  <%= submit(class: "inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500") do %>
+                    Watch Game
+                  <% end %>
+                </div>
               </div>
-            </div>
           <% else %>
-            <div class="pt-5">
-              <div class="flex justify-end">
-                <%= submit(class: "inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500") do %>
-                  <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-                  </svg>
-                  Join a Game
-                <% end %>
+            <%= if new_game?(@changeset) do %>
+              <div class="pt-5">
+                <div class="flex items-center justify-center">
+                  <%= submit(class: "inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500") do %>
+                    New Game
+                  <% end %>
+                </div>
               </div>
-            </div>
+            <% else %>
+              <div class="pt-5">
+                <div class="flex item_center justify-center">
+                  <%= submit(class: "inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500") do %>
+                    <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                    </svg>
+                    Join a Game
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
           <% end %>
         </div>
 
